@@ -4,6 +4,7 @@ interface IConfig {
     algorithm: string;
     encryptionKey: string;
     salt: string;
+    iv?: Buffer;
 }
 
 export default class Encryption {
@@ -11,12 +12,17 @@ export default class Encryption {
     private algorithm: string;
     private key: Buffer;
     private salt: string;
+    private iv: Buffer | null;
 
     constructor(config: IConfig) {
         this.algorithm = config.algorithm;
         this.salt = config.salt;
+        // encode encryption key from utf8 to hex
         const ENCRYPTION_KEY = config.encryptionKey ? Buffer.from(config.encryptionKey).toString('hex') : '';
+        // initialize key
         this.key = Buffer.from(ENCRYPTION_KEY, "hex");
+        // initialize IV
+        this.iv = config.iv || null;
     }
 
     /**
@@ -30,15 +36,14 @@ export default class Encryption {
         if (!value) {
             throw Error('A value is required!');
         }
-        // initialize IV as null as not required by algorithm
-        const iv = null;
 
-        // Initialize Cipher
-        const cipher = crypto.createCipheriv(this.algorithm, this.key, iv);
+        // Initialize Cipher instance
+        const cipher = crypto.createCipheriv(this.algorithm, this.key, this.iv);
 
         // Return Buffer as a binary encoded string
         let buffer = Buffer.from(value, 'utf8').toString("binary");
 
+        // Support for big integers
         if (isBigInt) {
             // Set byte auto padding to false
             cipher.setAutoPadding(false);
@@ -51,7 +56,7 @@ export default class Encryption {
             buffer = buf.toString("binary");
         }
 
-        // Get encrypted string from cipher
+        // Get encrypted data from the cipher instance
         const firstPart = cipher.update(buffer, "binary", "base64");
         const finalPart = cipher.final("base64")
 
@@ -61,26 +66,26 @@ export default class Encryption {
 
     /**
      * Function to decrypt a url token
-     * @param value string
+     * @param token string
      * @param isBigInt boolean
      * @returns string | null
      */
-    decrypt = (value?: string, isBigInt: boolean = false): string => {
-        if (!value) {
+    decrypt = (token?: string, isBigInt: boolean = false): string => {
+        if (!token) {
             throw Error('A token is required!');
         }
-        // initialize IV as null as it is not required by algorithm
-        const iv = null;
-        // Initialize Decipher
-        const decipher = crypto.createDecipheriv(this.algorithm, this.key, iv);
+        // Initialize Decipher instance
+        const decipher = crypto.createDecipheriv(this.algorithm, this.key, this.iv);
+
+        // Support for big integers
         if (isBigInt) {
             // Set byte auto padding to false
             decipher.setAutoPadding(false);
         }
         // encodes encrypted value from base64 to hex
-        const buffer = Buffer.from(value, "base64").toString("hex");
+        const buffer = Buffer.from(token, "base64").toString("hex");
 
-        // Get decrypted string from cipher
+        // Get decrypted data from decipher instance
         // @ts-ignore
         const firstPart = decipher.update(buffer, 'hex', 'base64');
         const finalPart = decipher.final('base64') || '';
@@ -91,6 +96,7 @@ export default class Encryption {
         // Encode decrypted value as a 64-bit Buffer
         const buf = Buffer.from(decrypted, "base64");
 
+        // Support for big integers
         if (isBigInt) {
             // Reads an unsigned, big-endian 64-bit integer from buf at the specified offset
             // and returns as a string
