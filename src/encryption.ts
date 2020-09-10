@@ -1,28 +1,33 @@
 import crypto from 'crypto';
 
 interface IConfig {
-    algorithm: string;
-    encryptionKey: string;
-    salt: string;
+    algorithm?: string;
+    encryptionKey?: string;
+    salt?: string;
     iv?: Buffer;
 }
 
 export default class Encryption {
 
     private algorithm: string;
-    private key: Buffer;
+    private key: Buffer | string;
     private salt: string;
     private iv: Buffer | null;
 
     constructor(config: IConfig) {
-        this.algorithm = config.algorithm;
-        this.salt = config.salt;
+        this.algorithm = config.algorithm || '';
+        this.salt = config.salt || '';
         // encode encryption key from utf8 to hex
         const ENCRYPTION_KEY = config.encryptionKey ? Buffer.from(config.encryptionKey).toString('hex') : '';
         // initialize key
-        this.key = Buffer.from(ENCRYPTION_KEY, "hex");
+        this.key = ENCRYPTION_KEY ? Buffer.from(ENCRYPTION_KEY, "hex") : '';
         // initialize IV
         this.iv = config.iv || null;
+
+        // validate missing config options
+        if (!this.algorithm && !this.key) {
+            throw Error('Configuration Error!');
+        }
     }
 
     /**
@@ -33,6 +38,7 @@ export default class Encryption {
      */
     encrypt = (value?: string, isBigInt: boolean = false): string => {
 
+        // Validate missing value
         if (!value) {
             throw Error('A value is required!');
         }
@@ -71,9 +77,12 @@ export default class Encryption {
      * @returns string | null
      */
     decrypt = (token?: string, isBigInt: boolean = false): string => {
+
+        // Validate missing token
         if (!token) {
             throw Error('A token is required!');
         }
+
         // Initialize Decipher instance
         const decipher = crypto.createDecipheriv(this.algorithm, this.key, this.iv);
 

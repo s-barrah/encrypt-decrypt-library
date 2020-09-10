@@ -76,4 +76,13 @@ describe('Encryption', () => {
         });
     });
 
+    describe('Ensure validation of library with no configuration', () => {
+        it('should fail to encrypt the string correctly', () => {
+            expect(() => new Encryption({}).encrypt('The world goes round and round')).to.throw('Configuration Error!');
+        });
+        it('should fail to decrypt the string correctly', () => {
+            expect(() => new Encryption({}).decrypt('n4a98Hps93o=', true)).to.throw('Configuration Error!');
+        });
+    });
+
 });
