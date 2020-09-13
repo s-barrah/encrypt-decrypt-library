@@ -6,12 +6,12 @@ const expect = chai.expect;
 
 describe('Encryption', () => {
     const config = {
-        algorithm: process.env.ALGORITHM || 'des-ede3',
-        encryptionKey: process.env.ENCRYPTION_KEY || 'AAAAAAAAAAAAAAAAAAAAAAAA',
-        salt: process.env.SALT || 'salt',
+        algorithm: process.env.ALGORITHM,
+        encryptionKey: process.env.ENCRYPTION_KEY,
+        salt: process.env.SALT,
     }
 
-    describe('Ensuring encrypting and decrypting of number and string', () => {
+    describe('Ensuring encrypting and decrypting of string and number', () => {
 
         it('should encrypt and decrypt the string correctly', () => {
             const testString = 'The world goes round and round';
@@ -22,17 +22,26 @@ describe('Encryption', () => {
             expect(testString).to.eql(decrypted);
         });
 
-        it('should encrypt and decrypt the number correctly', () => {
-            const testNumber = '447777111222';
+        it('should encrypt and decrypt the number as a big integer correctly', () => {
+            const testNumber = 1234567890;
             const encryptionLibrary = new Encryption(config);
             const encrypted = encryptionLibrary.encrypt(testNumber, true);
             const decrypted = encryptionLibrary.decrypt(encrypted, true);
             expect(encrypted.length > 0).to.eql(true);
-            expect(testNumber).to.eql(decrypted);
+            expect(String(testNumber)).to.eql(decrypted);
+        });
+
+        it('should encrypt and decrypt the number as an unsigned 64-bit integer correctly', () => {
+            const testNumber = 123;
+            const encryptionLibrary = new Encryption(config);
+            const encrypted = encryptionLibrary.encrypt(testNumber, true);
+            const decrypted = encryptionLibrary.decrypt(encrypted, true);
+            expect(encrypted.length > 0).to.eql(true);
+            expect(String(testNumber)).to.eql(decrypted);
         });
 
         it('should encrypt and decrypt the number as a string correctly', () => {
-            const testNumber = '447777111222';
+            const testNumber = '123';
             const encryptionLibrary = new Encryption(config);
             const encrypted = encryptionLibrary.encrypt(testNumber) || '';
             const decrypted = encryptionLibrary.decrypt(encrypted);
@@ -41,24 +50,24 @@ describe('Encryption', () => {
         });
     });
 
-    describe('Ensure decrypting of Big Integer token into a valid number', () => {
+    describe('Ensure decrypting of unsigned big endian token into a valid number', () => {
         it('should decrypt the encoded slug to a Big Integer correctly', () => {
-            const decrypted = new Encryption(config).decrypt('uX8R5SzcKfk=', true);
+            const decrypted = new Encryption(config).decrypt('NF1r855MimY=', true);
             expect(decrypted.length > 0).to.eql(true);
-            expect(decrypted).to.eql('447777111222');
+            expect(decrypted).to.eql('123');
         });
     });
 
-    describe('Ensure decrypting of string token into a valid string or number', () => {
+    describe('Ensure decrypting of string token into a valid string', () => {
         it('should decrypt the encoded slug to a valid string correctly', () => {
-            const decrypted = new Encryption(config).decrypt('TGSkN37JpT3Cn7xiQynavw==') || '';
+            const decrypted = new Encryption(config).decrypt('3XtsFcHjmBgVfSvhRMmp+A==') || '';
             expect(decrypted.length > 0).to.eql(true);
-            expect(decrypted).to.eql('447777111222');
+            expect(decrypted).to.eql('Hello world');
         });
     });
 
 
-    describe('Ensure decrypting of an 8-byte token into a valid number', () => {
+    describe('Ensure decrypting of an 8-byte Big integer token into a valid number', () => {
         it('should decrypt the encoded slug to a Big Integer correctly', () => {
             const decrypted = new Encryption(config).decrypt('n4a98Hps93o=', true);
             expect(decrypted.length > 0).to.eql(true);
@@ -77,10 +86,10 @@ describe('Encryption', () => {
     });
 
     describe('Ensure validation of library with no configuration', () => {
-        it('should fail to encrypt the string correctly', () => {
+        it('should fail to encrypt the string correctly and return an error message', () => {
             expect(() => new Encryption({}).encrypt('The world goes round and round')).to.throw('Configuration Error!');
         });
-        it('should fail to decrypt the string correctly', () => {
+        it('should fail to decrypt the string correctly and return an error message', () => {
             expect(() => new Encryption({}).decrypt('n4a98Hps93o=', true)).to.throw('Configuration Error!');
         });
     });

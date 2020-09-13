@@ -1,131 +1,132 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 
 interface IConfig {
-    algorithm?: string;
-    encryptionKey?: string;
-    salt?: string;
-    iv?: Buffer;
+  algorithm?: string;
+  encryptionKey?: string;
+  salt?: string;
+  iv?: Buffer;
 }
 
 export default class Encryption {
+  private algorithm: string;
 
-    private algorithm: string;
-    private key: Buffer | string;
-    private salt: string;
-    private iv: Buffer | null;
+  private key: Buffer | string;
 
-    constructor(config: IConfig) {
-        this.algorithm = config.algorithm || '';
-        this.salt = config.salt || '';
-        // encode encryption key from utf8 to hex
-        const ENCRYPTION_KEY = config.encryptionKey ? Buffer.from(config.encryptionKey).toString('hex') : '';
-        // initialize key
-        this.key = ENCRYPTION_KEY ? Buffer.from(ENCRYPTION_KEY, "hex") : '';
-        // initialize IV
-        this.iv = config.iv || null;
+  private salt: string;
 
-        // validate missing config options
-        if (!this.algorithm && !this.key) {
-            throw Error('Configuration Error!');
-        }
+  private iv: Buffer | null;
+
+  constructor(config: IConfig) {
+    this.algorithm = config.algorithm || "";
+    this.salt = config.salt || "";
+    // encode encryption key from utf8 to hex
+    const ENCRYPTION_KEY = config.encryptionKey
+      ? Buffer.from(config.encryptionKey).toString("hex")
+      : "";
+    // initialize key
+    this.key = ENCRYPTION_KEY ? Buffer.from(ENCRYPTION_KEY, "hex") : "";
+    // initialize IV
+    this.iv = config.iv || null;
+
+    // validate missing config options
+    if (!this.algorithm && !this.key) {
+      throw Error("Configuration Error!");
+    }
+  }
+
+  /**
+   * Function to encrypt a string into a url slug
+   * @param value string
+   * @param isInt boolean
+   * @return string | null
+   */
+  encrypt = (value?: string | number, isInt: boolean = false): string => {
+    // Validate missing value
+    if (!value) {
+      throw Error("A value is required!");
     }
 
-    /**
-     * Function to encrypt a string into a url slug
-     * @param value string
-     * @param isBigInt boolean
-     * @return string | null
-     */
-    encrypt = (value?: string, isBigInt: boolean = false): string => {
+    // Initialize Cipher instance
+    const cipher = crypto.createCipheriv(this.algorithm, this.key, this.iv);
 
-        // Validate missing value
-        if (!value) {
-            throw Error('A value is required!');
-        }
+    // Return Buffer as a binary encoded string
+    let buffer = Buffer.from(String(value), "utf8").toString("binary");
 
-        // Initialize Cipher instance
-        const cipher = crypto.createCipheriv(this.algorithm, this.key, this.iv);
+    // Support for small and big integers
+    if (isInt) {
+      // Set byte auto padding to false
+      cipher.setAutoPadding(false);
 
-        // Return Buffer as a binary encoded string
-        let buffer = Buffer.from(value, 'utf8').toString("binary");
-
-        // Support for big integers
-        if (isBigInt) {
-            // Set byte auto padding to false
-            cipher.setAutoPadding(false);
-
-            // allocate Buffer instance 8 bytes
-            const buf = Buffer.allocUnsafe(8);
-
-            // Write value to buf instance at the specified offset as big-endian.
-            buf.writeBigUInt64BE(BigInt(value));
-            buffer = buf.toString("binary");
-        }
-
-        // Get encrypted data from the cipher instance
-        const firstPart = cipher.update(buffer, "binary", "base64");
-        const finalPart = cipher.final("base64")
-
-        // concat and return both parts
-        return `${firstPart}${finalPart}`;
+      // allocate Buffer instance 8 bytes
+      const buf = Buffer.allocUnsafe(8);
+      /* global BigInt */
+      // Write value to buf instance at the specified offset as big-endian.
+      buf.writeBigUInt64BE(BigInt(value));
+      buffer = buf.toString("binary");
     }
 
-    /**
-     * Function to decrypt a url token
-     * @param token string
-     * @param isBigInt boolean
-     * @returns string | null
-     */
-    decrypt = (token?: string, isBigInt: boolean = false): string => {
+    // Get encrypted data from the cipher instance
+    const firstPart = cipher.update(buffer, "binary", "base64");
+    const finalPart = cipher.final("base64");
 
-        // Validate missing token
-        if (!token) {
-            throw Error('A token is required!');
-        }
+    // concat and return both parts
+    return `${firstPart}${finalPart}`;
+  };
 
-        // Initialize Decipher instance
-        const decipher = crypto.createDecipheriv(this.algorithm, this.key, this.iv);
-
-        // Support for big integers
-        if (isBigInt) {
-            // Set byte auto padding to false
-            decipher.setAutoPadding(false);
-        }
-        // encodes encrypted value from base64 to hex
-        const buffer = Buffer.from(token, "base64").toString("hex");
-
-        // Get decrypted data from decipher instance
-        // @ts-ignore
-        const firstPart = decipher.update(buffer, 'hex', 'base64');
-        const finalPart = decipher.final('base64') || '';
-
-        // concat both parts
-        const decrypted = `${firstPart}${finalPart}`;
-
-        // Encode decrypted value as a 64-bit Buffer
-        const buf = Buffer.from(decrypted, "base64");
-
-        // Support for big integers
-        if (isBigInt) {
-            // Reads an unsigned, big-endian 64-bit integer from buf at the specified offset
-            // and returns as a string
-            return buf.readBigUInt64BE(0).toString();
-        }
-        // convert decrypted value from base64 to utf-8 string
-        return buf.toString('utf8');
+  /**
+   * Function to decrypt a url token
+   * @param token string
+   * @param isInt boolean
+   * @returns string | null
+   */
+  decrypt = (token?: string, isInt: boolean = false): string => {
+    // Validate missing token
+    if (!token) {
+      throw Error("A token is required!");
     }
 
-    /**
-     * Function to validate token
-     * @param value String
-     * @return Boolean
-     */
-    validateByteLength(value: string) {
-        if (value) {
-            const byteLength = Buffer.byteLength(value, "base64");
-            return byteLength % 8 === 0;
-        }
+    // Initialize Decipher instance
+    const decipher = crypto.createDecipheriv(this.algorithm, this.key, this.iv);
+
+    // Support for small and big integers
+    if (isInt) {
+      // Set byte auto padding to false
+      decipher.setAutoPadding(false);
     }
+    // encodes encrypted value from base64 to hex
+    const buffer = Buffer.from(token, "base64").toString("hex");
 
+    // Get decrypted data from decipher instance
+    // @ts-ignore
+    const firstPart = decipher.update(buffer, "hex", "base64");
+    const finalPart = decipher.final("base64") || "";
 
+    // concat both parts
+    const decrypted = `${firstPart}${finalPart}`;
+
+    // Encode decrypted value as a 64-bit Buffer
+    const buf = Buffer.from(decrypted, "base64");
+
+    // Support for small and big integers
+    if (isInt) {
+      // Reads an unsigned, big-endian 64-bit integer from buf at the specified offset
+      // and returns as a string
+      return buf.readBigUInt64BE(0).toString();
+    }
+    // convert decrypted value from base64 to utf-8 string
+    return buf.toString("utf8");
+  };
+
+  /**
+   * Function to validate token
+   * @param value String
+   * @return Boolean | null
+   */
+  validateByteLength = (value: string): boolean | null => {
+    if (value) {
+      const byteLength = Buffer.byteLength(value, "base64");
+      return byteLength % 8 === 0;
+    }
+    return null;
+  };
 }

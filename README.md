@@ -25,7 +25,7 @@ const config = {
 const encryption = new Encryption(config);
 
 encryption.encrypt('Hello world')
-// hello-world-6y6106gq
+// 3XtsFcHjmBgVfSvhRMmp+A==
 ```
 
 ## Documentation
@@ -57,18 +57,15 @@ const config = {
 const encryption = new Encryption(config);
 
 encryption.encrypt('Hello world')
-// hello-world-6y6106gq
+// 3XtsFcHjmBgVfSvhRMmp+A==
 
-encryption.encrypt('01234567890')
-// hello-world-6y6106gq
+// Encrypted as a string
+encryption.encrypt('1234567890')
+// xCyGnx2ZzcrV3SVFz79u1A==
 
-// Encoded as string
-encryption.encrypt('447777111222')
-// TGSkN37JpT3Cn7xiQynavw==
-
-// Encoded as Big Integer
-encryption.encrypt('447777111222', true)
-// uX8R5SzcKfk=
+// Encrypted as an unsigned 64-bit Integer
+encryption.encrypt(123, true)
+// NF1r855MimY=
 ```
 
 ### decrypt(value: string, isBigInt: boolean)
@@ -80,7 +77,7 @@ The token that will be decrypted.
 
 #### isBigInt
 Type: `boolean` (optional) -
-The type of encrypted value if known. Provides support for Big Integer decryption.
+The type of encrypted value if known. Provides support for decrypting small and big integers.
 
 #### Example
 ```javascript
@@ -94,12 +91,12 @@ const config = {
 const encryption = new Encryption(config);
 
 // Encoded as string
-encryption.decrypt('TGSkN37JpT3Cn7xiQynavw==')
-// 447777111222
+encryption.decrypt('gmmBh17Q4QA=')
+// 123
 
 // Encoded as Big Integer
-encryption.decrypt('uX8R5SzcKfk=', true)
-// 447777111222
+encryption.decrypt('NF1r855MimY=', true)
+// 123 
 ```
 
 # Semantic release
