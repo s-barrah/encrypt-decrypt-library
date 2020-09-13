@@ -26,7 +26,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha \"tests/**/*.ts\" --require ts-node/register --require dotenv/config",
-    "lint": "eslint 'src/**/*.{js,ts,tsx}' --quiet --fix"
+    "lint": "eslint 'src/**/*.{js,ts}' --quiet --fix",
+    "build": "NODE_ENV=production tsc"
   },
   "husky": {
     "hooks": {
@@ -34,7 +35,7 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,scss}": [
+    "src/**/*.{js,ts}": [
       "prettier --single-quote --write",
       "eslint --fix"
     ]

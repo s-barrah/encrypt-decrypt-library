@@ -116,17 +116,4 @@ export default class Encryption {
     // convert decrypted value from base64 to utf-8 string
     return buf.toString("utf8");
   };
-
-  /**
-   * Function to validate token
-   * @param value String
-   * @return Boolean | null
-   */
-  validateByteLength = (value: string): boolean | null => {
-    if (value) {
-      const byteLength = Buffer.byteLength(value, "base64");
-      return byteLength % 8 === 0;
-    }
-    return null;
-  };
 }
