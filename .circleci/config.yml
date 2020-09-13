@@ -17,4 +17,4 @@ jobs:
 workflows:
   test-build-and-publish:
     jobs:
-      - build-and-test
+      - test-build-and-publish
