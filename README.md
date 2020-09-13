@@ -25,23 +25,25 @@ const config = {
 const encryption = new Encryption(config);
 
 encryption.encrypt('Hello world')
-// 3XtsFcHjmBgVfSvhRMmp+A==
+// xxxxxxx
 ```
 
 ## Documentation
 The library requires the following configuration options:
-- algorithm
-Type: `string` -
-The algorithm to be used by the library
+- **algorithm**: `String` - The algorithm type to be used by the library
 
-### encrypt(value: string, isBigInt: boolean)
+- **encryptionKey**: `String` - The encryption key to be used by the library
+
+- **salt**: `String` - The salt to be used by the library
+
+### encrypt(value: string, isInt: boolean)
 Returns an encrypted __value__.
 
 #### value
 Type: `string` -
 The value that will be encrypted.
 
-#### isBigInt
+#### isInt
 Type: `boolean` (optional) -
 The type of value. Provides support for Big Integer encryption.
 
@@ -56,26 +58,24 @@ const config = {
 } 
 const encryption = new Encryption(config);
 
+// Encrypted as a string
 encryption.encrypt('Hello world')
-// 3XtsFcHjmBgVfSvhRMmp+A==
 
 // Encrypted as a string
 encryption.encrypt('1234567890')
-// xCyGnx2ZzcrV3SVFz79u1A==
 
 // Encrypted as an unsigned 64-bit Integer
 encryption.encrypt(123, true)
-// NF1r855MimY=
 ```
 
-### decrypt(value: string, isBigInt: boolean)
+### decrypt(value: string, isInt: boolean)
 Returns a decrypted __value__.
 
 #### value
 Type: `string` -
 The token that will be decrypted.
 
-#### isBigInt
+#### isInt
 Type: `boolean` (optional) -
 The type of encrypted value if known. Provides support for decrypting small and big integers.
 
@@ -92,11 +92,11 @@ const encryption = new Encryption(config);
 
 // Encoded as string
 encryption.decrypt('gmmBh17Q4QA=')
-// 123
+// xxx
 
-// Encoded as Big Integer
+// Encoded as an integer
 encryption.decrypt('NF1r855MimY=', true)
-// 123 
+// xxx 
 ```
 
 # Semantic release
