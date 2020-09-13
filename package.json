@@ -1,6 +1,6 @@
 {
   "name": "encrypt-decrypt-library",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "Encryption Library",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -30,7 +30,8 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha \"tests/**/*.ts\" --require ts-node/register --require dotenv/config",
     "lint": "eslint 'src/**/*.{js,ts}' --quiet --fix",
-    "build": "NODE_ENV=production tsc"
+    "build": "NODE_ENV=production tsc",
+    "semantic-release": "semantic-release"
   },
   "husky": {
     "hooks": {
