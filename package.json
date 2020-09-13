@@ -23,6 +23,7 @@
     "lint-staged": "^10.3.0",
     "mocha": "^8.1.3",
     "prettier": "^2.1.1",
+    "rimraf": "^3.0.2",
     "semantic-release": "^17.1.1",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.2"
@@ -30,7 +31,7 @@
   "scripts": {
     "test": "./node_modules/.bin/mocha \"tests/**/*.ts\" --require ts-node/register --require dotenv/config",
     "lint": "eslint 'src/**/*.{js,ts}' --quiet --fix",
-    "build": "NODE_ENV=production tsc",
+    "build": "rimraf ./dist && NODE_ENV=production tsc",
     "semantic-release": "semantic-release"
   },
   "husky": {
