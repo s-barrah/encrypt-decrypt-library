@@ -1,3 +1,7 @@
+[![CircleCI](https://circleci.com/gh/s-barrah/encrypt-decrypt-library.svg?style=svg)](https://app.circleci.com/pipelines/github/s-barrah/encrypt-decrypt-library)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![semantic-release](https://badge.fury.io/js/encrypt-decrypt-library.svg)](https://www.npmjs.com/package/encrypt-decrypt-library)
+
 # encrypt-decrypt-library
 
 Multi-level Encryption Library for encrypting strings and big integers into unique tokens, safe for use in URL paths and queries.
