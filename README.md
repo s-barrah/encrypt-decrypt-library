@@ -4,7 +4,7 @@
 
 # encrypt-decrypt-library
 
-Multi-level Encryption Library for encrypting strings and big integers into unique tokens, safe for use in URL paths and queries.
+Simple Encryption Library for encrypting strings and integers into unique tokens, safe for use in URL paths and queries. Supports 64bit signed and unsigned big endians.
 
 ## Install
 ```bash
