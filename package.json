@@ -32,6 +32,7 @@
     "test": "./node_modules/.bin/mocha \"tests/**/*.ts\" --require ts-node/register --require dotenv/config",
     "lint": "eslint 'src/**/*.{js,ts}' --quiet --fix",
     "build": "rimraf ./dist && NODE_ENV=production tsc",
+    "build:prod": "NODE_ENV=production tsc --sourceMap false",
     "semantic-release": "semantic-release"
   },
   "husky": {
