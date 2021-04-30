@@ -9,11 +9,8 @@ interface IConfig {
 
 export default class Encryption {
   private algorithm: string;
-
   private key: Buffer | string;
-
   private salt: string;
-
   private iv: Buffer | null;
 
   constructor(config: IConfig) {
