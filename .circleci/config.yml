@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   node: circleci/node@1.1.6
 jobs:
-  test-build-and-publish:
+  build-test-and-publish:
     executor:
       name: node/default
     steps:
@@ -10,11 +10,11 @@ jobs:
       - node/with-cache:
           steps:
             - run: yarn install            #  Install dependencies
+            - run: yarn build:prod         #  Create production build
             - run: yarn lint               #  Test Code Style
             - run: yarn test               #  Run tests
-            - run: yarn build              #  Create production build
             - run: yarn semantic-release   #  Release to npm
 workflows:
-  test-build-and-publish:
+  build-test-and-publish:
     jobs:
-      - test-build-and-publish
+      - build-test-and-publish
